@@ -41,35 +41,22 @@ def load_leaderboard_data():
 def display_leaderboard(data):
     """Displays the filtered and sorted leaderboard data in a table with search term highlighting."""
     if data is not None:
-        st.subheader(f" MITRE LLM Leaderboard ")  # Add emoji for title
+        st.subheader(f" 🏆 MITRE LLM Leaderboard ")  # Add emoji for title
         st.markdown(F1_SCORE_DEFINITION)  # Display F1 Score definition
         st.markdown(
             EXACT_MATCH_SCORE_DEFINITION
         )  # Display Exact Match Score definition
 
-        data
-        search_term = st.text_input("Search (by all columns)")
+        # Add model selection dropdown with "All" option
+        model_options = ["All"] + data["Model"].unique().tolist()
+        selected_model = st.selectbox("Filter by Model", model_options)
 
-        if search_term:
-            search_query = (
-                rf"<b>{search_term}</b>"  # Wrap search term in bold for highlighting
-            )
-            filtered_data = data[
-                data.apply(
-                    lambda x: x.astype(str).str.contains(search_term, case=False)
-                )
-            ]
-            filtered_data.style.applymap(
-                lambda s: s.replace(search_query, search_query, regex=True)
-            )  # Apply highlighting using style.applymap
+        if selected_model == "All":
+            filtered_data = data.copy()
         else:
-            filtered_data = data
+            filtered_data = data[data["Model"] == selected_model]
 
-        st.table(
-            filtered_data.iloc[:, 1:].sort_values(
-                by=st.session_state.get("sort_column", "Description")
-            )
-        )
+        filtered_data
 
     else:
         st.info("Leaderboard data not available.")
@@ -89,13 +76,12 @@ def main():
         page_title="Leaderboard", layout="wide"
     )  # Set wide screen layout
 
-    # Create sidebar and add options
-    with st.sidebar:
-        selected_page = st.radio("Navigation", ["Leaderboard", "Help"])
+    # Create navigation using Streamlit functions
+    selected_page = st.sidebar.selectbox("Navigation", ["Home", "Help"])
 
     leaderboard_data = load_leaderboard_data()
 
-    if selected_page == "Leaderboard":
+    if selected_page == "Home":
         user_input_section()  # Placeholder section (search is in display_leaderboard)
         display_leaderboard(leaderboard_data)
     else:
