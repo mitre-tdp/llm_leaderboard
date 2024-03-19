@@ -77,15 +77,23 @@ def main():
     )  # Set wide screen layout
 
     # Create navigation using Streamlit functions
-    selected_page = st.sidebar.selectbox("Navigation", ["Home", "Help"])
+    # selected_page = st.sidebar.selectbox("Navigation", ["Home", "Help"])
 
     leaderboard_data = load_leaderboard_data()
 
-    if selected_page == "Home":
-        user_input_section()  # Placeholder section (search is in display_leaderboard)
+    tab_home, tab_help, tab3 = st.tabs(["Home", "Help", "Tab 3"])
+    with tab_home:
+        user_input_section()
         display_leaderboard(leaderboard_data)
-    else:
+    
+    with tab_help:
         display_help_page()
+
+    # if selected_page == "Home":
+    #     user_input_section()  # Placeholder section (search is in display_leaderboard)
+    #     display_leaderboard(leaderboard_data)
+    # else:
+    #     display_help_page()
 
 
 if __name__ == "__main__":
