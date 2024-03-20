@@ -48,15 +48,33 @@ def display_leaderboard(data):
         )  # Display Exact Match Score definition
 
         # Add model selection dropdown with "All" option
-        model_options = ["All"] + data["Model"].unique().tolist()
-        selected_model = st.selectbox("Filter by Model", model_options)
+        model_options = ["All"] + data["Task"].unique().tolist()
+        selected_model = st.selectbox("Filter by Task", model_options)
 
         if selected_model == "All":
             filtered_data = data.copy()
         else:
-            filtered_data = data[data["Model"] == selected_model]
+            filtered_data = data[data["Task"] == selected_model]
 
         filtered_data
+
+        # Group-by calculations
+        grouped_data = (
+            filtered_data.groupby("Task")
+            .agg(
+                Avg_F1_Score=("F1 Score", "mean"),
+                Avg_Exact_Match_Score=("Exact Match Score", "mean"),
+            )
+            .reset_index()
+            .sort_values(
+                by="Avg_F1_Score", ascending=False
+            )  # Sort by Avg_F1_Score (optional)
+        )
+
+        # Concatenate group-by results with original data for all columns
+        all_data = pd.concat([filtered_data, grouped_data], ignore_index=True)
+
+        all_data
 
     else:
         st.info("Leaderboard data not available.")
