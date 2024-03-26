@@ -38,18 +38,29 @@ def load_leaderboard_data():
 #     st.table(filtered_data.sort_values(by=st.session_state.get("sort_column", "Model")))
 
 
+def format_details(details_text):
+    """Formats details text for display in a popup."""
+    return f"<p style='font-family:sans-serif; color:black; white-space: pre-wrap;'>{details_text}</p>"
+
+
 def display_leaderboard(data):
     """Displays the filtered and sorted leaderboard data in a table with search term highlighting."""
     if data is not None:
-        st.subheader(f" 🏆 MITRE LLM Leaderboard ")  # Add emoji for title
-        st.markdown(F1_SCORE_DEFINITION)  # Display F1 Score definition
-        st.markdown(
-            EXACT_MATCH_SCORE_DEFINITION
-        )  # Display Exact Match Score definition
+        st.header(
+            f" 🏆 Aviation Language Understanding Evaluation Benchmark "
+        )  # Add emoji for title
+        st.write(
+            f"The Leaderboard aims to enable the evaluation, benchmarking, and assessment of large language models with aviation datasets and use cases."
+        )  # Add emoji for title
+
+        # st.markdown(F1_SCORE_DEFINITION)  # Display F1 Score definition
+        # st.markdown(
+        #     EXACT_MATCH_SCORE_DEFINITION
+        # )  # Display Exact Match Score definition
 
         # Add model selection dropdown with "All" option
         model_options = ["All"] + data["Task"].unique().tolist()
-        selected_model = st.selectbox("Filter by Task", model_options)
+        selected_model = st.selectbox("Select a task:", model_options)
 
         if selected_model == "All":
             filtered_data = data.copy()
@@ -58,23 +69,44 @@ def display_leaderboard(data):
 
         filtered_data
 
-        # Group-by calculations
-        grouped_data = (
-            filtered_data.groupby("Task")
-            .agg(
-                Avg_F1_Score=("F1 Score", "mean"),
-                Avg_Exact_Match_Score=("Exact Match Score", "mean"),
-            )
-            .reset_index()
-            .sort_values(
-                by="Avg_F1_Score", ascending=False
-            )  # Sort by Avg_F1_Score (optional)
+        if filtered_data.empty:
+            st.info("No data to display")
+        # else:
+        #     # Proceed with formatting and display
+        #     st.table(
+        #         filtered_data.style.format("Model").to_html(
+        #             escape=False, full_width=True, index=False
+        #         )
+        #     )
+
+        # Create clickable table with details popup
+        st.write(
+            "This table presents the average F1 score for each model across all tasks"
         )
+        # st.table(
+        #     filtered_data.style.format(
+        #         "Model", format_details
+        #     ).to_html(escape=False, full_width=True, index=False)
+        # )
+
+        st.write("HHH")
+        # Group-by calculations
+        # grouped_data = (
+        #     filtered_data.groupby("Task")
+        #     .agg(
+        #         Avg_F1_Score=("F1 Score", "mean"),
+        #         Avg_Exact_Match_Score=("Exact Match Score", "mean"),
+        #     )
+        #     .reset_index()
+        #     .sort_values(
+        #         by="Avg_F1_Score", ascending=False
+        #     )  # Sort by Avg_F1_Score (optional)
+        # )
 
         # Concatenate group-by results with original data for all columns
-        all_data = pd.concat([filtered_data, grouped_data], ignore_index=True)
+        # all_data = pd.concat([filtered_data, grouped_data], ignore_index=True)
 
-        all_data
+        # all_data
 
     else:
         st.info("Leaderboard data not available.")
@@ -107,10 +139,9 @@ def main():
     with tab_help:
         display_help_page()
 
-    # if selected_page == "Home":
-    #     user_input_section()  # Placeholder section (search is in display_leaderboard)
-    #     display_leaderboard(leaderboard_data)
-    # else:
+    with tab3:
+        st.write("This is Tab 3")
+
     #     display_help_page()
 
 
